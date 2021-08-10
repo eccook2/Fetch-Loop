@@ -9,6 +9,10 @@
 // main.c
 // Created by: Ethan Cook, 8.10.2021
 
+#include <stdio.h>
+#include <string.h>
+#include <windows.h>
+
 // Stores the system stats for the device.
 struct Sys_Stats {
 	char device_name[50];
@@ -17,8 +21,8 @@ struct Sys_Stats {
 	char gpu_name[50];
 
 	int uptime_min;
-	int mem_used;
-	int mem_total;
+	double mem_used;
+	double mem_total;
 	int cpu_used;
 	int gpu_used;
 	int cpu_temp;
@@ -29,11 +33,81 @@ struct Sys_Stats {
 
 // TODO Setup error handling
 
-// TODO Create helper functions to update each struct member
+/////////
+// Below are setter methods to update each member of the Sys_Stats struct
+// 
+// Functions
+//	TODO set_device_name
+//	TODO set_os
+//	TODO set_cpu_name
+//	TODO set_gpu_name
+//	TODO set_uptime
+//	DONE set_mem_used
+//	DONE set_mem_total
+//	TODO set_cpu_used
+//	TODO set_gpu_used
+//	TODO set_cpu_temp
+//	TODO set_gpu_temp
+//	TODO set_hd_temp
+//  WIP  update_stats  // calls all setter methods and checks for errors
+/////////
+
+// Sets the used physical memory (RAM) of the system (in gigabytes)
+// Returns 0 on success, -1 on failure.
+int set_mem_used(Sys_Stats* sys) {
+	MEMORYSTATUSEX meminfo;
+	meminfo.dwLength = sizeof(MEMORYSTATUSEX);
+
+	if (GlobalMemoryStatusEx(&meminfo) == 0) {
+		return -1;
+	}
+
+	sys->mem_used = (meminfo.ullTotalPhys - meminfo.ullAvailPhys) / 1000000000.0;
+	return 0;
+}
+
+// Sets the total physical memory (RAM) of the system (in gigabytes)
+// Returns 0 on success, -1 on failure.
+int set_mem_total(Sys_Stats* sys) {
+	MEMORYSTATUSEX meminfo;
+	meminfo.dwLength = sizeof(MEMORYSTATUSEX);
+
+	if (GlobalMemoryStatusEx(&meminfo) == 0) {
+		return -1;
+	}
+
+	sys->mem_total = meminfo.ullTotalPhys / 1000000000.0;
+	return 0;
+}
+
+// Calls all setter methods to update all the members of the given Sys_Stats struct
+// Handles any errors that occur
+void update_stats(Sys_Stats* sys) {
+	if (set_mem_used(sys) == -1) {
+		// TODO handle error
+	}
+
+	if (set_mem_total(sys) == -1) {
+		// TODO handle error
+	}
+}
 
 // TODO Create functions to display the stats on the command line
 
 int main()
 {
-	
+	Sys_Stats sys = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+	// Infinite loop;
+	//	1. Update all struct members
+	//	2. Print to command line TODO Pretty display functions replace this
+	//	3. Sleep for a bit
+	//	4. Clear the Screen
+	// TODO Implement signal handling to kill the program
+	while (1) {
+		update_stats(&sys);
+		printf("Memory Used: %f / %f\n", sys.mem_used, sys.mem_total);
+		Sleep(2000);
+		system("@cls||clear");
+	}
 }
