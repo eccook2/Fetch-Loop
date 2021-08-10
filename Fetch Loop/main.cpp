@@ -9,6 +9,7 @@
 // main.c
 // Created by: Ethan Cook, 8.10.2021
 
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
@@ -31,6 +32,13 @@ struct Sys_Stats {
 	int hd2_temp;
 };
 
+// Signal Handler for SIGINT
+void sigint_handler(int sig_num) {
+	printf("\nExiting... \n");
+	
+	exit(0);
+}
+
 // TODO Setup error handling
 
 /////////
@@ -51,6 +59,18 @@ struct Sys_Stats {
 //	TODO set_hd_temp
 //  WIP  update_stats  // calls all setter methods and checks for errors
 /////////
+
+int set_os(Sys_Stats* sys) {
+	#ifdef _WIN32
+		#ifdef _WIN64
+			strcpy(sys->os, "Windows 64 bit");
+		#else
+			strcpy(sys->os, "Windows 32 bit");
+		#endif
+	#endif
+
+
+}
 
 // Sets the used physical memory (RAM) of the system (in gigabytes)
 // Returns 0 on success, -1 on failure.
@@ -97,16 +117,17 @@ void update_stats(Sys_Stats* sys) {
 int main()
 {
 	Sys_Stats sys = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	signal(SIGINT, sigint_handler);
 
 	// Infinite loop;
 	//	1. Update all struct members
-	//	2. Print to command line TODO Pretty display functions replace this
+	//	2. Print to command line TODO Pretty display functions will replace this
 	//	3. Sleep for a bit
 	//	4. Clear the Screen
-	// TODO Implement signal handling to kill the program
+
 	while (1) {
 		update_stats(&sys);
-		printf("Memory Used: %f / %f\n", sys.mem_used, sys.mem_total);
+		printf("Memory Used: %f of %f GB\n", sys.mem_used, sys.mem_total);
 		Sleep(2000);
 		system("@cls||clear");
 	}
