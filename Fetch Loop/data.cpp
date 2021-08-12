@@ -10,6 +10,8 @@
 #include <windows.h>
 #include "data.h"
 
+#define GB 1073741824.0;
+
 /////////
 // Below are setter methods to update each member of the Sys_Stats struct
 // 
@@ -28,6 +30,20 @@
 //	TODO set_hd_temp
 //  WIP  update_stats  // calls all setter methods and checks for errors
 /////////
+
+// Sets the uptime members (days, hours, minutes)
+// No return value because GetTickCount64() doesn't return error values
+void set_uptime(Sys_Stats* sys) {
+	int uptime_ms = (int)GetTickCount64();
+
+	sys->uptime_dys = uptime_ms / (1000 * 60 * 60 * 24);
+	uptime_ms -= sys->uptime_dys * 86400000;
+
+	sys->uptime_hrs = uptime_ms / (1000 * 60 * 60);
+	uptime_ms -= sys->uptime_hrs * 3600000;
+
+	sys->uptime_min = uptime_ms / (1000 * 60);
+}
 
 // Set device name by accessing sysinfoapi.h
 // Currently broken. Trouble using TCHARs etc.
@@ -115,4 +131,5 @@ void update_stats(Sys_Stats* sys) {
 	if (sys->cpu_load == -1.0) {
 		// TODO handle error
 	}
+	set_uptime(sys);
 }

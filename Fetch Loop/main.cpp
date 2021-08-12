@@ -35,6 +35,7 @@ int main()
 
 	while (1) {
 		update_stats(&sys);
+		printf("System Uptime: %d:%d:%d\n", sys.uptime_dys, sys.uptime_hrs, sys.uptime_min);
 		printf("Memory Used: %f of %f GB  CPU Load: %f%%\n", sys.mem_used, sys.mem_total, sys.cpu_load * 100);
 		Sleep(2000);
 		system("@cls||clear");
